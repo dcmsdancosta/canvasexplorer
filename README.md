@@ -16,9 +16,16 @@
 - trello_key
 - trello_token
 - trello_list
+- mentor_list *Apenas para essa versão do módulo
+- topics_list *Apenas para essa versão do módulo
 
 ### Features
 
 - [x] Scan dos posts no Canvas
 - [x] Criação do card no Trello
 - [ ] Criação de uma base de conhecimento
+
+### Como executar via Docker?
+
+docker build -t canvas . 
+docker run canvas:latest

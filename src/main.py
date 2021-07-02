@@ -5,7 +5,8 @@ import yaml
 
 def main():
     issues = ts.execute()
-    cc.executeIssues(issues)
+    if(issues is not None):
+        cc.executeIssues(issues)
 
 if __name__ == '__main__':
     main()

@@ -54,14 +54,13 @@ def get_discussion_topics_details(course, topic_id):
 def filter_discussion_topics_details(json_topic):
     #Unnesting dictionary
     #print(json_topic)
-    last_period = datetime.strftime(datetime.now() - timedelta(1), '%Y-%m-%dT00:00:00Z')
+    last_period = datetime.strftime(datetime.now() - timedelta(2), '%Y-%m-%dT00:00:00Z')
     try:
         replies = json_topic['recent_replies']
         replies_number = len(replies)
         interaction_list = [reply['user']['id'] for reply in replies if reply['user']['id'] in mentor_list]
         last_mentor_interaction = max([reply['created_at'] for reply in replies if reply['user']['id'] in mentor_list])
         last_interaction = max([reply['created_at'] for reply in replies if reply['user']['id']])
-        # print(interaction_list, replies_number, json_topic['created_at'], last_period, last_mentor_interaction, last_interaction)
         if((replies_number == 0 and json_topic['created_at'] > last_period) or (last_mentor_interaction < last_interaction and json_topic['created_at'] > last_period)):
             return [json_topic['created_at'], cleanhtml(json_topic['message']), json_topic['user_name']]
     except:
