@@ -27,5 +27,5 @@
 
 ### Como executar via Docker?
 
-docker build -t canvas . &nbsp;
+docker build -t canvas . \
 docker run canvas:latest
