@@ -12,6 +12,7 @@ bearer_token = parameters['bearer_token']
 base_url = parameters['base_url']
 header = {'Authorization': 'Bearer ' + bearer_token}
 mentor_list = parameters['mentor_list']
+courses_list = parameters['courses_list']
 
 def cleanhtml(raw_html):
   cleanr = re.compile('<.*?>')
@@ -52,16 +53,16 @@ def get_discussion_topics_details(course, topic_id):
 
 def filter_discussion_topics_details(json_topic):
     #Unnesting dictionary
-    last_period = datetime.strftime(datetime.now() - timedelta(30), '%Y-%m-%dT00:00:00Z')
+    #print(json_topic)
+    last_period = datetime.strftime(datetime.now() - timedelta(1), '%Y-%m-%dT00:00:00Z')
     try:
         replies = json_topic['recent_replies']
         replies_number = len(replies)
-        mentor_intervention = False
-        last_update = max([update['created_at'] for update in replies])
         interaction_list = [reply['user']['id'] for reply in replies if reply['user']['id'] in mentor_list]
-                            #reply['created_at'] == last_update
-                            
-        if((len(interaction_list) == 0 or replies_number == 0) and json_topic['created_at'] > last_period):
+        last_mentor_interaction = max([reply['created_at'] for reply in replies if reply['user']['id'] in mentor_list])
+        last_interaction = max([reply['created_at'] for reply in replies if reply['user']['id']])
+        # print(interaction_list, replies_number, json_topic['created_at'], last_period, last_mentor_interaction, last_interaction)
+        if((replies_number == 0 and json_topic['created_at'] > last_period) or (last_mentor_interaction < last_interaction and json_topic['created_at'] > last_period)):
             return [json_topic['created_at'], cleanhtml(json_topic['message']), json_topic['user_name']]
     except:
         pass
@@ -70,9 +71,10 @@ def execute():
     try:
         columns = ['course', 'topic', 'url', 'created_at', 'message', 'user_name']
         final_df = pd.DataFrame()
-        courses_list = get_courses_list()
+        #courses_list = get_courses_list()
         for course in courses_list:
             topics = pd.DataFrame(get_discussion_topics(course), columns=['course', 'topic', 'url'])
+
             if(len(topics)>0):
                 for index,row in topics.iterrows():
                     filtered_results = get_discussion_topics_details(row['course'], row['topic'])
